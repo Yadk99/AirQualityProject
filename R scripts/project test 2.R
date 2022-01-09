@@ -1,7 +1,9 @@
 library(openair)
 library(tidyverse)
 library(tsbox)
-
+library(imputeTS)
+library(ggmap)
+library(ggrepel)
 
 metadata <- importMeta(source = "AURN")
 londonMeta <- filter(metadata, metadata$longitude > -0.460861 & metadata$longitude < 0.184806)
@@ -9,32 +11,38 @@ londonMetaAll <- filter(londonMeta, londonMeta$latitude > 51.35866 & londonMeta$
 
 summary(londonMetaAll)
 
-closedSites <- read.csv('C:\\Users\\yadlo\\Desktop\\Year 3\\Project\\closedSites.csv')
+closedSites <- read.csv('C:\\Users\\yadlo\\Desktop\\Year 3\\Project\\Data\\closedSites.csv')
 
 londonMetaOpen <- filter(londonMetaAll, !(londonMetaAll$code %in% closedSites$ï..Sites))
 
-londonSample <- sample_n(londonMetaOpen, 3)
-
-sampleData <- importAURN(londonSample$code, year = 2015:2020, data_type = "daily")
-
 londonMetaOpen$code
 
-londonData <- importAURN(londonMetaOpen$code, year = 2015:2020,
+londonData <- importAURN(londonMetaOpen$code, year = 2015:2021,
                           verbose = TRUE, meta = TRUE)
 
 boxplot <- ggplot(londonData, aes(x = site_type, y = pm10, color = site_type)) + geom_boxplot()
 
-boxplot
+sites <- unique(londonData$site)
+longitude <- unique(londonData$longitude)
+latitude <- unique(londonData$latitude)
+latitude <- append(latitude, 51.52253, after = length(latitude))
 
-londonDataomit <- londonData %>%
-  na.omit()
+siteLocation <- data.frame(sites, longitude, latitude)
 
-londonDataSites <- londonData %>%
-  group_by()
+for (i in 1:17) {
+  print(sites[i])
+  siteFilter <- filter(londonData, londonData$site == sites[i])
+  print(summary(siteFilter))
+}
 
-unique(londonData$site)
+summary(londonData)
 
-londonFilter <- londonData[londonData$site=="London Westminster",]
-summary(londonFilter)
+cor(londonData[4:17],)
 
-londonFilter$date <- ts_ts(londonFilter$date)
+londonMap = get_map(source = 'stamen', location = 'London', maptype = 'terrain-lines')
+
+ggmap(londonMap)
+
+ggmap(londonMap) + geom_point(aes(x = longitude, y = latitude),
+                    data = siteLocation) + geom_text_repel(data = siteLocation, 
+                    aes(x = longitude, y = latitude, label = sites), size = 3)
