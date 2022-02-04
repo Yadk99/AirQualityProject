@@ -5,18 +5,27 @@ library(imputeTS)
 library(ggmap)
 library(ggrepel)
 
+# importing metadata, including latitude and longitude
 metadata <- importMeta(source = "AURN")
+# creating london borders by looking at the sites one the edges of london and 
+# taking positional data of those site, probably bo the best method
 londonMeta <- filter(metadata, metadata$longitude > -0.460861 & metadata$longitude < 0.184806)
 londonMetaAll <- filter(londonMeta, londonMeta$latitude > 51.35866 & londonMeta$latitude < 51.66864)
 
 summary(londonMetaAll)
 
+# On the londonair website, some sites have been closed in the last decade however
+# data for them will still be attempted to be imported resulting in errors. This
+# list of will filter out the closed sites
 closedSites <- read.csv('C:\\Users\\yadlo\\Desktop\\Year 3\\Project\\Data\\closedSites.csv')
 
 londonMetaOpen <- filter(londonMetaAll, !(londonMetaAll$code %in% closedSites$ï..Sites))
 
 londonMetaOpen$code
 
+# openair package allows data to be imported directly as R data objects, here I 
+# am importing based on the site codes I have left after filtering, meta = true 
+# means site type (area details) and positional data is included
 londonData <- importAURN(londonMetaOpen$code, year = 2015:2021,
                           verbose = TRUE, meta = TRUE)
 
@@ -37,8 +46,8 @@ for (i in 1:17) {
 
 summary(londonData)
 
-cor(londonData[4:17],)
-
+# google maps api to plot the locations of the sites in the dataset on to a map
+# of London
 londonMap = get_map(source = 'stamen', location = 'London', maptype = 'terrain-lines')
 
 ggmap(londonMap)
@@ -46,3 +55,26 @@ ggmap(londonMap)
 ggmap(londonMap) + geom_point(aes(x = longitude, y = latitude),
                     data = siteLocation) + geom_text_repel(data = siteLocation, 
                     aes(x = longitude, y = latitude, label = sites), size = 3)
+                    
+# plotting a bar graph of proportion of missing data (not NA values, but timesteps
+# that are missing)
+missingDataGraph <- ggplot(londonData[,2], aes(x=code)) +
+  geom_bar()
+  
+missingDataGraph
+
+# filtering out the sites with incomplete dataset
+missingCode <- c('BDMP', 'HP1', 'HR3', 'TED')
+
+londonDataFilter <- filter(londonData, !(code %in% missingCode))
+
+summary(londonDataFilter)
+
+sites <- unique(londonDataFilter$site)
+
+# printing a summary for each site which includes NA values for each variable
+for (i in 1:13) {
+  print(sites[i])
+  siteFilter <- filter(londonDataFilter, londonDataFilter$site == sites[i])
+  print(summary(siteFilter))
+}
