@@ -20,7 +20,7 @@ kensDataNoNA <- drop_na(kensData)
 corrMatrix <- corrplot(cor(kensDataNoNA[,4:11]))#correlation plot, feature selection
 
 sum(kensData$o3<0, na.rm = TRUE)
-#shouldnt have negative values, error in data capture
+#should not have negative values, error in data capture
 kensDataOnly <- kensData[,4:11]
 
 bound <- rbind(c(1, 0, Inf), c(2, 0, Inf), c(3, 0, Inf), c(4, 0, Inf), c(5, 0, Inf),
@@ -41,12 +41,28 @@ summary(marlDataAmelia$imputations$imp1)
 
 ggplot_na_distribution(kensData[,4])
 kensData[names(kensDataAmelia$imputations$imp1)] <- kensDataAmelia$imputations$imp1
+summary(kensData)
+marlData[names(marlDataAmelia$imputations$imp1)] <- marlDataAmelia$imputations$imp1
+summary(marlData)
 #data left that is completely missing, cannot be imputed
 #to keep tempral integrity, replace with mean values of column, small amount
 #therefore small effect on prediction
 
 marlData <- na_mean(marlData)
 kensData <- na_mean(kensData)
+
+#replacing negative values, perhaps error in calibration, therefore
+#assume that negative values are minimum values that are able to be captured.
+#Using EU standard methods, can find how each pollutant is captured and 
+#also the minimum value possible to be captured 
+# https://uk-air.defra.gov.uk/networks/monitoring-methods?view=eu-standards
+#minimum value that is captured is 0, therefore replacing negative values with 0
+#https://www.csagroupuk.org/wp-content/uploads/2019/04/MCERTSCertifiedProductsCAMS.pdf
+
+kensData[,4:10][kensData[,4:10] < 0] <- 0
+sum(kensData$o3<0, na.rm = TRUE)
+marlData[,4:10][marlData[,4:10] < 0] <- 0
+sum(marlData$o3<0, na.rm = TRUE)
 
 NO2Data <- kensData[,c(3,5,9:11)]
 NO2Data <- rename(NO2Data, no2Kens = no2, wsKens = ws, wdKens = wd, air_tempKens
@@ -88,8 +104,4 @@ PM25Data <- PM25Data[, c(1:5, 12:15)]
 PM25Data <- rename(PM25Data, pm2.5Marl = pm2.5, wsMarl = ws, wdMarl = wd, air_tempMarl
                   = air_temp)
 
-#replacing negative values, perhaps error in calibration, therefore
-#assume that negative values are minimum values that are able to be captured.
-#Using EU standard methods, can find how each pollutant is captured and 
-#also the minimum value possible to be captured 
-# https://uk-air.defra.gov.uk/networks/monitoring-methods?view=eu-standards
+summary(PM25Data)
