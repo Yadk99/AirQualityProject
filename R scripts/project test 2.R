@@ -7,11 +7,16 @@ library(ggrepel)
 
 # importing metadata, including latitude and longitude
 metadata <- importMeta(source = "AURN")
+metadataKCL <- importMeta(source = "kcl")
 # creating london borders by looking at the sites one the edges of london and 
 # taking positional data of those site, probably bo the best method
 londonMeta <- filter(metadata, metadata$longitude > -0.460861 & metadata$longitude < 0.184806)
 londonMetaAll <- filter(londonMeta, londonMeta$latitude > 51.35866 & londonMeta$latitude < 51.66864)
 
+metadataKCL <- filter(metadataKCL, metadataKCL$longitude > -0.460861 & metadataKCL$longitude < 0.184806)
+metadataKCL <- filter(metadataKCL, metadataKCL$latitude > 51.35866 & metadata$latitude < 51.66864)
+
+summary(metadataKCL)
 summary(londonMetaAll)
 
 # On the londonair website, some sites have been closed in the last decade however
@@ -20,27 +25,45 @@ summary(londonMetaAll)
 closedSites <- read.csv('C:\\Users\\yadlo\\Desktop\\Year 3\\Project\\Data\\closedSites.csv')
 
 londonMetaOpen <- filter(londonMetaAll, !(londonMetaAll$code %in% closedSites$ï..Sites))
-
-londonMetaOpen$code
+metaKCLOpen <- filter(metadataKCL, !(metadataKCL$code %in% closedSites$ï..Sites))
 
 # openair package allows data to be imported directly as R data objects, here I 
 # am importing based on the site codes I have left after filtering, meta = true 
 # means site type (area details) and positional data is included
-londonData <- importAURN(londonMetaOpen$code, year = 2015:2021,
+londonData <- importAURN(londonMetaOpen$code, year = 2015:2021, pollutant = 
+                           c("co", "no2", "so2", "pm2.5"),
                           verbose = TRUE, meta = TRUE)
+
+
+
+londonKCLSites <- metaKCLOpen$code
+
+londonDataKCL <- importKCL(site = londonKCLSites, year = 2015:2021, pollutant = 
+                                      c("co", "no2", "so2", "pm25"))
 
 boxplot <- ggplot(londonData, aes(x = site_type, y = pm10, color = site_type)) + geom_boxplot()
 
+boxplot
+
 sites <- unique(londonData$site)
+sitesKCL <- unique(londonDataKCL$code)
 longitude <- unique(londonData$longitude)
 latitude <- unique(londonData$latitude)
 latitude <- append(latitude, 51.52253, after = length(latitude))
 
 siteLocation <- data.frame(sites, longitude, latitude)
 
+londonDataFilter <- londonData[,c(1:4, 6, 8, 9, 11, 16:21)]
+
 for (i in 1:17) {
   print(sites[i])
-  siteFilter <- filter(londonData, londonData$site == sites[i])
+  siteFilter <- dplyr::filter(londonDataFilter, londonData$site == sites[i])
+  print(summary(siteFilter))
+}
+
+for (i in 1:57) {
+  print(sitesKCL[i])
+  siteFilter <- dplyr::filter(londonDataKCL, londonDataKCL$code == sitesKCL[i])
   print(summary(siteFilter))
 }
 
