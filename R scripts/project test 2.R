@@ -4,6 +4,7 @@ library(tsbox)
 library(imputeTS)
 library(ggmap)
 library(ggrepel)
+library(skimr)
 
 # importing metadata, including latitude and longitude
 metadata <- importMeta(source = "AURN")
@@ -31,19 +32,37 @@ metaKCLOpen <- filter(metadataKCL, !(metadataKCL$code %in% closedSites$ï..Sites)
 # am importing based on the site codes I have left after filtering, meta = true 
 # means site type (area details) and positional data is included
 londonData <- importAURN(londonMetaOpen$code, year = 2015:2021, pollutant = 
-                           c("co", "no2", "so2", "pm2.5"),
+                           c("co", "no2", "so2", "pm2.5", "o3"),
                           verbose = TRUE, meta = TRUE)
-
-
 
 londonKCLSites <- metaKCLOpen$code
 
 londonDataKCL <- importKCL(site = londonKCLSites, year = 2015:2021, pollutant = 
                                       c("co", "no2", "so2", "pm25"))
 
-boxplot <- ggplot(londonData, aes(x = site_type, y = pm10, color = site_type)) + geom_boxplot()
+NO2boxplot <- ggplot(londonDataAURN, aes(x = site_type, y = no2, color = site)) + 
+  geom_boxplot(outlier.shape = NA) +
+  coord_cartesian(ylim = c(0, 180)) +
+  ggtitle("Distribution of NO2 values by site") +
+  xlab("Site Type") + ylab("NO2 (µg/m3)")
 
-boxplot
+MissingO3bySite <- londonDataAURN %>%
+    group_by(site) %>%
+    summarise(sum(is.na(o3)))
+
+MissingO3bySite['percentMissing'] <- MissingO3bySite$`sum(is.na(o3))` / 61368
+MissingO3bySite['valuesPresent'] <- 1 - MissingO3bySite$percentMissing  
+
+missingO3Plot <- ggplot(MissingO3bySite, aes(x = percentMissing, y = site)) +
+  geom_bar(stat = 'identity', fill = 'orange') + ggtitle("Missing O3 values by site") +
+  scale_x_continuous(labels = scales::percent) +
+  xlab("Proportion of Missing Values") + ylab("Site")
+
+skimData <- skim(londonDataAURN)
+summary(londonDataAURN)
+
+missingO3Plot
+NO2boxplot
 
 sites <- unique(londonData$site)
 sitesKCL <- unique(londonDataKCL$code)
