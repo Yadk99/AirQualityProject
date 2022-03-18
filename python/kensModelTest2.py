@@ -24,6 +24,7 @@ kensDailyData = pandas.read_csv(path)
 pandas.to_datetime(kensDailyData['date'])
 
 kensDailyData.drop('Unnamed: 0', axis=1, inplace=True)
+
 plt.figure(figsize=(16,8))
 kensDailyData.head()
 
