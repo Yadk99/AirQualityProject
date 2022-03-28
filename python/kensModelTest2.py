@@ -11,12 +11,14 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 import pandas
 import tensorflow
 import numpy
+import statsmodels.api as sm
+from statsmodels.tsa.seasonal import seasonal_decompose
 import matplotlib.pyplot as plt
 from tensorflow import keras
 from keras.models import Sequential
 from keras.layers import Dense, LSTM, Dropout, GRU, SimpleRNN
 
-path = r"C:\Users\yadlo\Desktop\Year 3\Project\python\kensDataDaily.csv"
+path = r"C:\Users\yadlo\Desktop\Year 3\Project\Data\kensDataDaily.csv"
 
 kensDailyData = pandas.read_csv(path)
 
@@ -25,21 +27,21 @@ pandas.to_datetime(kensDailyData['date'])
 
 kensDailyData.drop('Unnamed: 0', axis=1, inplace=True)
 
-plt.figure(figsize=(16,8))
 kensDailyData.head()
 
 kensDailyData.plot()
 
 df = kensDailyData.drop(['o3', 'pm2.5'], axis=1)
 
-from statsmodels.tsa.seasonal import seasonal_decompose
-
 df.info()
 df['date'] = pandas.to_datetime(df['date'])
 df = df.set_index('date').asfreq('D')
-seasonalData = seasonal_decompose(df, model='additive')
+seasonalData = sm.tsa.seasonal_decompose(df, model='additive')
 
-seasonalData.plot()
+trend = seasonalData.trend
+
+trend.plot()
+plt.ylabel("NO2 (µg/m3)")
 
 # function that will split data into train and test set
 def trainTestSplit(trainProportion, data):
