@@ -2,7 +2,6 @@ library(openair)
 library(tidyverse)
 library(imputeTS)
 library(corrplot)
-library(sqldf)
 
 # importing 2 datasets with the most complete data
 marylData <- importAURN('MY1', year = 2015:2021)
@@ -11,7 +10,7 @@ kensData <- importAURN('KC1', year = 2015:2021)
 
 # This code was needed as  different sources of data had a different amount of 
 # rows in the dataset, the data was compared and and the missing rows were transferred
-#In the end, i decided to use AURN source rather than the KCL as the data was 
+# In the end, i decided to use AURN source rather than the KCL as the data was 
 # more complete
 # kensDataNoNA <- drop_na(kensData)
 # 

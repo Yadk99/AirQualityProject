@@ -1,10 +1,8 @@
 library(openair)
 library(tidyverse)
-library(tsbox)
 library(imputeTS)
 library(ggmap)
 library(ggrepel)
-library(skimr)
 
 # importing metadata, including latitude and longitude
 metadata <- importMeta(source = "AURN")
@@ -45,24 +43,6 @@ NO2boxplot <- ggplot(londonDataAURN, aes(x = site_type, y = no2, color = site)) 
   coord_cartesian(ylim = c(0, 180)) +
   ggtitle("Distribution of NO2 values by site") +
   xlab("Site Type") + ylab("NO2 (µg/m3)")
-
-MissingO3bySite <- londonDataAURN %>%
-    group_by(site) %>%
-    summarise(sum(is.na(o3)))
-
-MissingO3bySite['percentMissing'] <- MissingO3bySite$`sum(is.na(o3))` / 61368
-MissingO3bySite['valuesPresent'] <- 1 - MissingO3bySite$percentMissing  
-
-missingO3Plot <- ggplot(MissingO3bySite, aes(x = percentMissing, y = site)) +
-  geom_bar(stat = 'identity', fill = 'orange') + ggtitle("Missing O3 values by site") +
-  scale_x_continuous(labels = scales::percent) +
-  xlab("Proportion of Missing Values") + ylab("Site")
-
-skimData <- skim(londonDataAURN)
-summary(londonDataAURN)
-
-missingO3Plot
-NO2boxplot
 
 sites <- unique(londonData$site)
 sitesKCL <- unique(londonDataKCL$code)

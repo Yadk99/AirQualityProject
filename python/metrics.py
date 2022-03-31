@@ -27,19 +27,21 @@ metricsData = {'NO2': no2Metrics,
 
 metricsDf = pandas.DataFrame(metricsData)
 
-metricsDf.to_csv(r"C:\Users\yadlo\Desktop\Year 3\Project\python\data\Finalmetrics.csv")
+metricsDf.to_csv(r".\data\Finalmetrics.csv")
 
 
-dfPath = r"C:\Users\yadlo\Desktop\Year 3\Project\python\data\allData.csv"
+dfPath = r".\data\allData.csv"
 
 allData = pandas.read_csv(dfPath, index_col = 0)
 
+#creating dataframe for O3 to get full scope of predictions
 O3data = pandas.DataFrame({'date' : allData['date'],
                            'O3 Actual' : allData['o3Kens']})
 
 O3preds = pandas.DataFrame(columns =['date',
                             'O3 Predicted'])
 
+#matching the indexes for predictions and actual
 O3preds['date'] = O3preds['date'].append(allData['date'].tail(248), ignore_index=True)
 O3preds['O3 Predicted'] = preds['O3 Predictions']
 
@@ -54,12 +56,14 @@ O3preds = O3preds.set_index('date')
 O3data.tail
 O3preds.tail
 
+#plotting both on the same graph
 plt.plot(O3data, label = 'Actual Values')
 plt.plot(O3preds, label = 'Predicted Values')
 plt.xlabel('Time')
 plt.ylabel('O3 (µg/m3)')
 plt.legend()
 
+#creating a date index for predcitions to plot
 preds['date'] = None
 
 preds['date'] = allData.tail(248).to_numpy()
@@ -67,6 +71,7 @@ preds['date'] = allData.tail(248).to_numpy()
 preds['date'] = pandas.to_datetime(preds['date'], format='%Y-%m-%d')
 preds = preds.set_index('date')
 
+#plotted each pollutant manually
 plt.plot(preds[['CO Predictions', 'CO Actual']])
 plt.xlabel('Date')
 plt.ylabel('CO (PPM)')

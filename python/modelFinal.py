@@ -17,6 +17,8 @@ from sklearn.compose import ColumnTransformer
 
 path = r".\data\allData.csv"
 dataset = pandas.read_csv(path, index_col=(0))
+
+#set date to a datetime object and making it the index
 dataset['date'] = pandas.to_datetime(dataset['date'], format='%Y-%m-%d %H:%M:%S')
 dataset = dataset.set_index('date')
 
@@ -28,6 +30,7 @@ cols = [col for col in dataset.columns if col not in ['coKens', 'coMary']]
 
 train, valid, test = tools.trainTestSplit(0.7, 0.1, dataset)
 
+#this allows for transformations to occur on certain columns
 scaler = ColumnTransformer(remainder='passthrough', transformers=[
   ('minmax', MinMaxScaler(), cols)])
 
@@ -45,7 +48,6 @@ minmax = scaler.named_transformers_['minmax']
 
 window = 7
 
-#no2 - done, o3 - done, so2 - done, pm25 - done  
 trainX, trainY = tools.createWindow(scaledTrain, window)
 validX, validY = tools.createWindow(scaledValid, window)
 testX, testY = tools.createWindow(scaledTest, window)
@@ -75,14 +77,10 @@ def inverseValues(data):
     data[col] = inverse
   return data
       
-
+#creates predictions dataframe
 predictions = tools.getPredictions(model2, testX, testY)
 
 realPredictions = inverseValues(predictions)
-
-predictions.columns
-
-predictions.tail
 
 tools.plotLoss(history)
 
@@ -90,4 +88,4 @@ plot_model(model2, show_shapes=(True), show_layer_activations=(True))
 
 model2.save(r'.\finalModel')
 
-realPredictions.to_csv(r".\data\preds3.csv")
+realPredictions.to_csv(r".\data\preds2.csv")

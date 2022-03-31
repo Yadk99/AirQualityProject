@@ -26,15 +26,18 @@ def trainTestSplit(trainProportion, testProportion, data):
     test = data[-(testNum):]
     return train, valid, test
   
-
 def createWindow(df, windowSize):
   data = []
   target = []
+  #as the loop starts with the first x values, it needs to stop before going 
+  #out of bounds
   for i in range(len(df) - windowSize):
+    #take x amount of rows and append to the data
     row = [r for r in df[i:i+windowSize]]
     data.append(row)
     #[0] indicates the column that is being used as the label, [0] = no2,
     #[1] = o3, [8] = so2, [3] = pm2.5, [13] = co
+    #the next value will be used as the label, therefore +windowSize
     label = [df[i+windowSize][0], df[i+windowSize][1], df[i+windowSize][8],
              df[i+windowSize][3], df[i+windowSize][13]]
     target.append(label)
@@ -53,6 +56,7 @@ def createInitialModel(features, window):
 
 def getPredictions(model, data, target):
   predictions = model.predict(data)
+  #slice the 2d array by the column to create a 1d array
   no2Preds, o3Preds, so2Preds, pm25Preds, coPreds = predictions[:,0], predictions[:,1], predictions[:,2], predictions[:,3], predictions[:,4]
   no2Actual, o3Actual, so2Actual, pm25Actual, coActual = target[:,0], target[:,1], target[:,2],target[:,3],target[:,4]
   df = pandas.DataFrame(data = {'NO2 Predictions': no2Preds,
