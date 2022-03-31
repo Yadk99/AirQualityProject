@@ -6,7 +6,8 @@ The aim for this project is to create a machine learning model that can predict 
   * openair
   * Amelia
   * corrplot
-  * imputeTs                  
+  * imputeTs
+  * lubridate                  
 * Python
   * numpy
   * pandas
