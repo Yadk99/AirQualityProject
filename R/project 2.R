@@ -10,7 +10,7 @@ library(skimr)
 metadata <- importMeta(source = "AURN")
 metadataKCL <- importMeta(source = "kcl")
 # creating london borders by looking at the sites one the edges of london and 
-# taking positional data of those site, probably bo the best method
+# taking positional data of those site, probably not the best method
 londonMeta <- filter(metadata, metadata$longitude > -0.460861 & metadata$longitude < 0.184806)
 londonMetaAll <- filter(londonMeta, londonMeta$latitude > 51.35866 & londonMeta$latitude < 51.66864)
 
@@ -23,7 +23,7 @@ summary(londonMetaAll)
 # On the londonair website, some sites have been closed in the last decade however
 # data for them will still be attempted to be imported resulting in errors. This
 # list of will filter out the closed sites
-closedSites <- read.csv('C:\\Users\\yadlo\\Desktop\\Year 3\\Project\\Data\\closedSites.csv')
+closedSites <- read.csv('Data\\closedSites.csv')
 
 londonMetaOpen <- filter(londonMetaAll, !(londonMetaAll$code %in% closedSites$ï..Sites))
 metaKCLOpen <- filter(metadataKCL, !(metadataKCL$code %in% closedSites$ï..Sites))

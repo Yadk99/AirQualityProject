@@ -15,13 +15,13 @@ from keras.callbacks import ModelCheckpoint, EarlyStopping
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.compose import ColumnTransformer
 
-path = r"C:\Users\yadlo\Desktop\Year 3\Project\python\data\allData.csv"
+path = r".\data\allData.csv"
 dataset = pandas.read_csv(path, index_col=(0))
 dataset['date'] = pandas.to_datetime(dataset['date'], format='%Y-%m-%d %H:%M:%S')
 dataset = dataset.set_index('date')
 
-modelPath = r'C:\Users\yadlo\Desktop\Year 3\Project\python\models\finalModel'
-testModelPath = r'C:\Users\yadlo\Desktop\Year 3\Project\python\models\testModel'
+modelPath = r'.\models\finalModel'
+testModelPath = r'.\models\testModel'
 
 #ignore certain columns for scaling, as they are already between 0 and 1
 cols = [col for col in dataset.columns if col not in ['coKens', 'coMary']]
@@ -88,6 +88,6 @@ tools.plotLoss(history)
 
 plot_model(model2, show_shapes=(True), show_layer_activations=(True))
 
-model2.save(r'C:\Users\yadlo\Desktop\Year 3\Project\python\models\finalModel')
+model2.save(r'.\finalModel')
 
-realPredictions.to_csv(r"C:\Users\yadlo\Desktop\Year 3\Project\python\data\preds3.csv")
+realPredictions.to_csv(r".\data\preds3.csv")

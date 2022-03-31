@@ -1,6 +1,6 @@
 library(tidyverse)
 
-AirQuality =  read.csv('C:\\Users\\yadlo\\Desktop\\Year 3\\Project\\R scripts\\Project test 1\\EalingJan2020to2021Clean.csv')
+AirQuality =  read.csv('Data\\EalingJan2020to2021Clean.csv')
 
 # converting string datetime into R datetime data type
 AirQuality$ReadingDateTime <- lubridate::dmy_hm(AirQuality$ReadingDateTime)
@@ -22,7 +22,7 @@ airQualityLine <- ggplot(data = AirQuality, aes(ReadingDateTime)) + scale_y_log1
   
 airQualityLine
 
-airQualityTrend <-ggplot(data = AirQuality, aes(ReadingDateTime)) + scale_y_log10() +
+airQualityTrend <- ggplot(data = AirQuality, aes(ReadingDateTime)) + scale_y_log10() +
   geom_smooth(aes(y = NO), colour = "red",se=FALSE) +
   geom_smooth(aes(y = NO2), colour = "green", se=FALSE) +
   geom_smooth(aes(y = NOX), colour = "black", se=FALSE) +

@@ -4,7 +4,7 @@ library(Amelia)
 library(imputeTS)
 library(corrplot)
 
-londonDataAURN <- read.csv("C:\\Users\\yadlo\\Desktop\\Year 3\\Project\\Data\\londonDataAURN.csv")
+londonDataAURN <- read.csv("Data\\londonDataAURN.csv")
 londonDataAURN <- londonDataAURN[,2:15]
 
 summary(londonDataAURN[,4:11])

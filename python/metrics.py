@@ -9,7 +9,7 @@ import pandas
 import tools
 import matplotlib.pyplot as plt
 
-path = r"C:\Users\yadlo\Desktop\Year 3\Project\python\data\preds2.csv"
+path = r"./data/preds2.csv"
 
 preds = pandas.read_csv(path, index_col=0)
 
